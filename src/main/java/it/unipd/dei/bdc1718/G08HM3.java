@@ -18,6 +18,8 @@ public class G08HM3 {
       throw new IllegalArgumentException("Expecting the file name on the command line");
     }
 
+    //sto cazzzzzzoooooooooooooooooooooooooooooo
+
     // Setup Spark efwefwe
     SparkConf conf = new SparkConf(true).setAppName("Preliminaries");
     JavaSparkContext sc = new JavaSparkContext(conf);
