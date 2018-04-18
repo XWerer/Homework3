@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class G08HM3 {
 
-  public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws Exception {
     if (args.length == 0){
       throw new IllegalArgumentException("Expecting the file name on the command line");
     }
