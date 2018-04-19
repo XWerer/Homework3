@@ -14,8 +14,8 @@ public class G08HM3 {
             throw new IllegalArgumentException("Expecting the file name on the command line");
 
         // Setup Spark
-        SparkConf conf = new SparkConf(true).setAppName("Homework 3");
-        JavaSparkContext sc = new JavaSparkContext(conf);
+        //SparkConf conf = new SparkConf(true).setAppName("Homework 3");
+        //JavaSparkContext sc = new JavaSparkContext(conf);
 
         ArrayList<Vector> points = InputOutput.readVectorsSeq(args[0]);
 
@@ -52,11 +52,11 @@ public class G08HM3 {
                     if(dist.get(j)> distanza) { //trovo il punto più distante da il resto dal punto inizale
                         max = P.get(j);
                         distanza = dist.get(j);
-                        indice=j;
+                        indice = j;
                     }
                 }
                 else{//negli altri
-                    temp=dist.get(j) + Vectors.sqdist(centers.get(i), P.get(j));
+                    temp = dist.get(j) + Vectors.sqdist(centers.get(i), P.get(j));
                     dist.set(j,temp);
                     if(dist.get(j)> distanza) { //trovo il punto più distante da il resto dei punti
                         max = P.get(j);
@@ -66,9 +66,10 @@ public class G08HM3 {
                 }
             }//fine for P
             primo = false;
-            centers.add(max);                                        //quando lho trovato lo aggiungo a quelli trovati e lo
-            P.remove(max);                                           //tolgo così non lo conisidero più
-            dist.remove(indice);                                     //tolgo anche la distanza annessa
+            centers.add(max);           //quando lho trovato lo aggiungo a quelli trovati e lo
+            P.remove(max);              //tolgo così non lo conisidero più
+            //P.remove(indice);         //forse meglio in termini di efficenza questo
+            dist.remove(indice);        //tolgo anche la distanza annessa
         }//fine for k
         return centers;
     }
