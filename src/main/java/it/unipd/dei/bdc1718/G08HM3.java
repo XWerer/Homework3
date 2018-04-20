@@ -19,20 +19,39 @@ public class G08HM3 {
 
         ArrayList<Vector> points = InputOutput.readVectorsSeq(args[0]);
 
-        //tempo del k-center
+        //time for k-center algorithm
         long start = System.currentTimeMillis();
-        ArrayList<Vector> centri = kcenter(points,10);
+        ArrayList<Vector> centers0 = kcenter(points,10);
         long end = System.currentTimeMillis();
-        System.out.println("Time for kcenter is: " + (end - start) + " ms");
+        System.out.println("Time for k-center algorithm is: " + (end - start) + " ms");
 
-        //just for debug
-        System.out.println("i centri sono: " + centri.size());
-        for(int i = 0; i < centri.size(); i++) {
-            System.out.println(centri.get(i));
-        }
+        //For viewing the centers computed by k-center
+        System.out.println("The number of centers of k-center algorithm are: " + centers0.size() + " and are:");
+        for(Vector center : centers0)
+            System.out.println(center);
+
+        //We need to clean and reload the points from the file because we modify they by using k-means
+        points.clear();
+        points = InputOutput.readVectorsSeq(args[0]);
+
+        //Initialization of the weights
+        ArrayList<Long> weights = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++)
+            weights.add(1L);
+
+        //time for k-means++ algorithm
+        start = System.currentTimeMillis();
+        ArrayList<Vector> centers1 = kmeansPP(points, weights,10);
+        end = System.currentTimeMillis();
+        System.out.println("Time for k-means++ algorithm is: " + (end - start) + " ms");
+
+        //For viewing the centers computed by k-means++
+        System.out.println("The number of centers of k-means++ algorithm are: " + centers1.size() + " and are:");
+        for(Vector center : centers1)
+            System.out.println(center);
     }
 
-    //Method kcenter with time complexity O( |P| * k )
+    //Method k-center with time complexity O( |P| * k )
     private static ArrayList<Vector> kcenter (ArrayList<Vector> P ,int k){
         ArrayList<Vector> centers = new ArrayList<>();
         Vector max = Vectors.zeros(1);  //mi salvo il quello che sta a distanza massima
@@ -75,29 +94,51 @@ public class G08HM3 {
         return centers;
     }
 
-    //Method kmeans++ with weight
-    private static ArrayList<Vector> kmeansPP(ArrayList<Vector> points, ArrayList<Long> weight, int k){
-        ArrayList<Vector> centers = new ArrayList<>();
-        ArrayList<Double> probDistrib = new ArrayList<>();
-        ArrayList<Double> dist = new ArrayList<>();
-        centers.add(points.remove((int)(Math.random()*points.size())));
-        double distance;
-        boolean firstIt = true;
+    //Method k-means++ weighed with time complexity O( |P| * k )
+    private static ArrayList<Vector> kmeansPP(ArrayList<Vector> points, ArrayList<Long> weights, int k){
+        ArrayList<Vector> centers = new ArrayList<>(); //ArrayList for the centers
+        ArrayList<Double> dist = new ArrayList<>(); //ArrayList for the distances
+        //Now we pick the first center randomly and remove it from the points and the weights
+        int firstCenter = (int)(Math.random()*points.size());
+        centers.add(points.remove(firstCenter));
+        weights.remove(firstCenter);
+        double distance, totalDistance = 0;
+        boolean firstIt = true; //For manage the first center
         for (int i = 0; i < k-1; i++){
-            for (Vector point : points ){
-                //Qui bisogna fare la distribuzione per poterci mettere meno tempo! appena risco la finisco
-                /*
+            for (int j = 0; j < points.size(); j++){
                 if(firstIt){
-                    distance = Vectors.sqdist(centers.get(i), point);
-                    probDistrib.add(distance + dist.get(dist.size()))
+                    //In the first iteration we need to compute only the distance
+                    distance = Vectors.sqdist(points.get(j), centers.get(0));
                     dist.add(distance);
+                    totalDistance += distance;
                 }
-                */
+                else{
+                    //In a generic iteration we need to take the minimum distance
+                    distance = Vectors.sqdist(points.get(j), centers.get(i-1));
+                    if(distance < dist.get(j)){
+                        dist.set(j, distance);
+                        totalDistance += distance;
+                    }
+                    else
+                        totalDistance += dist.get(j);
+                }
             }
+            //We go to choose  the next center with the probability distribution
+            double r = Math.random(); //For a random value
+            double value = 0; //The incrementation of the probability
+            for(int j = 0; j < points.size(); j++){
+                value += dist.get(j) * weights.get(j) / totalDistance;
+                if (r < (value)) {
+                    //In this case we can take the new center and remove the corresponding value from the other List
+                    centers.add(points.remove(j-1));
+                    dist.remove(j-1);
+                    weights.remove(j-1);
+                    break;
+                }
+            }
+            totalDistance = 0;
+            firstIt = false;
         }
-
-
-
         return centers;
     }
 }
