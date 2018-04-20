@@ -95,26 +95,26 @@ public class G08HM3 {
     }
 
     //Method k-means++ weighed with time complexity O( |P| * k )
-    private static ArrayList<Vector> kmeansPP(ArrayList<Vector> points, ArrayList<Long> weights, int k){
+    private static ArrayList<Vector> kmeansPP(ArrayList<Vector> P, ArrayList<Long> weights, int k){
         ArrayList<Vector> centers = new ArrayList<>(); //ArrayList for the centers
         ArrayList<Double> dist = new ArrayList<>(); //ArrayList for the distances
         //Now we pick the first center randomly and remove it from the points and the weights
-        int firstCenter = (int)(Math.random()*points.size());
-        centers.add(points.remove(firstCenter));
+        int firstCenter = (int)(Math.random()*P.size());
+        centers.add(P.remove(firstCenter));
         weights.remove(firstCenter);
         double distance, totalDistance = 0;
         boolean firstIt = true; //For manage the first center
         for (int i = 0; i < k-1; i++){
-            for (int j = 0; j < points.size(); j++){
+            for (int j = 0; j < P.size(); j++){
                 if(firstIt){
                     //In the first iteration we need to compute only the distance
-                    distance = Vectors.sqdist(points.get(j), centers.get(0));
+                    distance = Vectors.sqdist(P.get(j), centers.get(0));
                     dist.add(distance);
                     totalDistance += distance;
                 }
                 else{
                     //In a generic iteration we need to take the minimum distance
-                    distance = Vectors.sqdist(points.get(j), centers.get(i-1));
+                    distance = Vectors.sqdist(P.get(j), centers.get(i-1));
                     if(distance < dist.get(j)){
                         dist.set(j, distance);
                         totalDistance += distance;
@@ -126,11 +126,11 @@ public class G08HM3 {
             //We go to choose  the next center with the probability distribution
             double r = Math.random(); //For a random value
             double value = 0; //The incrementation of the probability
-            for(int j = 0; j < points.size(); j++){
+            for(int j = 0; j < P.size(); j++){
                 value += dist.get(j) * weights.get(j) / totalDistance;
                 if (r < (value)) {
                     //In this case we can take the new center and remove the corresponding value from the other List
-                    centers.add(points.remove(j-1));
+                    centers.add(P.remove(j-1));
                     dist.remove(j-1);
                     weights.remove(j-1);
                     break;
