@@ -78,7 +78,24 @@ public class G08HM3 {
     //Method kmeans++ with weight
     private static ArrayList<Vector> kmeansPP(ArrayList<Vector> points, ArrayList<Long> weight, int k){
         ArrayList<Vector> centers = new ArrayList<>();
-        ArrayList<Double> distances = new ArrayList<>();
+        ArrayList<Double> probDistrib = new ArrayList<>();
+        ArrayList<Double> dist = new ArrayList<>();
+        centers.add(points.remove((int)(Math.random()*points.size())));
+        double distance;
+        boolean firstIt = true;
+        for (int i = 0; i < k-1; i++){
+            for (Vector point : points ){
+                //Qui bisogna fare la distribuzione per poterci mettere meno tempo! appena risco la finisco
+                /*
+                if(firstIt){
+                    distance = Vectors.sqdist(centers.get(i), point);
+                    probDistrib.add(distance + dist.get(dist.size()))
+                    dist.add(distance);
+                }
+                */
+            }
+        }
+
 
 
         return centers;
