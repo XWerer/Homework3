@@ -32,7 +32,8 @@ public class G08HM3 {
         }
     }
 
-    private static ArrayList<Vector> kcenter (ArrayList<Vector> P ,int k){ //O( |P| * k )
+    //Method kcenter with time complexity O( |P| * k )
+    private static ArrayList<Vector> kcenter (ArrayList<Vector> P ,int k){
         ArrayList<Vector> centers = new ArrayList<>();
         Vector max = Vectors.zeros(1);  //mi salvo il quello che sta a distanza massima
         ArrayList<Double> dist = new ArrayList<>(); //distanza massima
@@ -71,6 +72,15 @@ public class G08HM3 {
             //P.remove(indice);         //forse meglio in termini di efficenza questo
             dist.remove(indice);        //tolgo anche la distanza annessa
         }//fine for k
+        return centers;
+    }
+
+    //Method kmeans++ with weight
+    private static ArrayList<Vector> kmeansPP(ArrayList<Vector> points, ArrayList<Long> weight, int k){
+        ArrayList<Vector> centers = new ArrayList<>();
+        ArrayList<Double> distances = new ArrayList<>();
+
+
         return centers;
     }
 }
