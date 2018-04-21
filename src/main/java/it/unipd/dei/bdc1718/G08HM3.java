@@ -143,6 +143,7 @@ public class G08HM3 {
         return centers;
     }
 
+    //time complexity: O(|P|*k)
     private static double kmeansObj(ArrayList<Vector> P, ArrayList<Vector> C) {
         //Arraylist that keeps the distances between a point and all centers
         ArrayList<Double> distancePC = new ArrayList<Double>();
