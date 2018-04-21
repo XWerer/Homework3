@@ -6,6 +6,7 @@ import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class G08HM3 {
 
@@ -140,5 +141,29 @@ public class G08HM3 {
             firstIt = false;
         }
         return centers;
+    }
+
+    private static double kmeansObj(ArrayList<Vector> P, ArrayList<Vector> C) {
+        //Arraylist that keeps the distances between a point and all centers
+        ArrayList<Double> distancePC = new ArrayList<Double>();
+        //ArrayList to keep the distance of a point from its center (minimum)
+        ArrayList<Double> dists = new ArrayList<Double>();
+        for (int i = 0; i < P.size(); i++) {
+            for (int j = 0; j < C.size(); j++) {
+                //writing in distancePC the squared distances between a point and all centers
+                distancePC.add(Vectors.sqdist(P.get(i), C.get(j)));
+            }
+            //adding in dists the minimum distance -> the distance of a point from its center
+            dists.add(Collections.min(distancePC));
+            //clearing of distancePC, for the next point
+            distancePC.clear();
+        }
+        //now i have dists with all distances between a point and its center
+        //computing the average
+        double sum = 0;
+        for (Double dist : dists) {
+            sum += dist;
+        }
+        return sum/P.size();
     }
 }
