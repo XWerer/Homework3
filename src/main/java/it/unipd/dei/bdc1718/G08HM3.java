@@ -8,6 +8,8 @@ import org.apache.spark.mllib.linalg.Vectors;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/*commento a caso per vedere se va */
+
 public class G08HM3 {
 
     public static void main(String[] args) throws Exception {
