@@ -1,57 +1,86 @@
 package it.unipd.dei.bdc1718;
 
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
-/*commento a caso per vedere se va */
 
 public class G08HM3 {
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 0)
-            throw new IllegalArgumentException("Expecting the file name on the command line");
+        if (args.length != 3)
+            throw new IllegalArgumentException("Expecting 3 parameters (file name, k, k1)");
 
-        // Setup Spark
-        //SparkConf conf = new SparkConf(true).setAppName("Homework 3");
-        //JavaSparkContext sc = new JavaSparkContext(conf);
+        //Some variables
+        long start, end; //Variables for measuring the time of the algorithm
+        int k, k1;
+        ArrayList<Vector> centers;
 
+        //Take the value k and k1 form the command line
+        try {
+            k = Integer.valueOf(args[1]);
+            k1 = Integer.valueOf(args[2]);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("k and k1 must be integer");
+        }
+
+        if (k >= k1)
+            throw new IllegalArgumentException("Expecting k < k1");
+
+        //Read the set P from the file passed in input
         ArrayList<Vector> points = InputOutput.readVectorsSeq(args[0]);
 
-        //time for k-center algorithm
-        long start = System.currentTimeMillis();
-        ArrayList<Vector> centers0 = kcenter(points,10);
-        long end = System.currentTimeMillis();
-        System.out.println("Time for k-center algorithm is: " + (end - start) + " ms");
+        //Run k-center algorithm and measure the time
+        start = System.currentTimeMillis();
+        centers = kcenter(points, k);
+        end = System.currentTimeMillis();
+        System.out.println("\nTime for k-center algorithm is: " + (end - start) + " ms");
 
         //For viewing the centers computed by k-center
-        System.out.println("The number of centers of k-center algorithm are: " + centers0.size() + " and are:");
-        for(Vector center : centers0)
+        System.out.println("The number of centers of k-center algorithm are: " + centers.size() + " and are:");
+        for(Vector center : centers)
             System.out.println(center);
 
-        //We need to clean and reload the points from the file because we modify they by using k-means
-        points.clear();
-        points = InputOutput.readVectorsSeq(args[0]);
+        //We need to add the centers to the set P because the algorithm above modify it
+        points.addAll(centers);
 
         //Initialization of the weights
         ArrayList<Long> weights = new ArrayList<>();
         for (int i = 0; i < points.size(); i++)
             weights.add(1L);
 
-        //time for k-means++ algorithm
+        //Run k-means++ algorithm and measure the time
         start = System.currentTimeMillis();
-        ArrayList<Vector> centers1 = kmeansPP(points, weights,10);
+        centers = kmeansPP(points, weights, k);
         end = System.currentTimeMillis();
-        System.out.println("Time for k-means++ algorithm is: " + (end - start) + " ms");
+        System.out.println("\nTime for k-means++ algorithm is: " + (end - start) + " ms");
 
         //For viewing the centers computed by k-means++
-        System.out.println("The number of centers of k-means++ algorithm are: " + centers1.size() + " and are:");
-        for(Vector center : centers1)
+        System.out.println("The number of centers of k-means++ algorithm are: " + centers.size() + " and are:");
+        for(Vector center : centers)
             System.out.println(center);
+
+        //Now we can run the k-meansObj algorithm
+        System.out.println("\nThe average of the distances is " + kmeansObj(points, centers));
+
+        //We need to add the centers to the set P because the algorithm above modify it
+        points.addAll(centers);
+
+        //Now we are going to extract a coreset where we can run k-means++
+        //The first thing to do is to run k-center
+        centers = kcenter(points, k1);
+
+        //Now we need to create the weights for centers
+        weights.clear();
+        for (int i = 0; i < k1; i++)
+            weights.add(1L);
+
+        //Now we can run k-means++ for extract the coreset from centers
+        ArrayList<Vector> coreSet = kmeansPP(centers, weights, k);
+
+        //Now print the returned value from k-meansObj
+        System.out.println("\nThe average of the distances in the coreset is: " + kmeansObj(points, coreSet));
     }
 
     //Method k-center with time complexity O( |P| * k )
@@ -148,13 +177,13 @@ public class G08HM3 {
     //time complexity: O(|P|*k)
     private static double kmeansObj(ArrayList<Vector> P, ArrayList<Vector> C) {
         //Arraylist that keeps the distances between a point and all centers
-        ArrayList<Double> distancePC = new ArrayList<Double>();
+        ArrayList<Double> distancePC = new ArrayList<>();
         //ArrayList to keep the distance of a point from its center (minimum)
-        ArrayList<Double> dists = new ArrayList<Double>();
-        for (int i = 0; i < P.size(); i++) {
-            for (int j = 0; j < C.size(); j++) {
+        ArrayList<Double> dists = new ArrayList<>();
+        for (Vector point : P) {
+            for (Vector center : C) {
                 //writing in distancePC the squared distances between a point and all centers
-                distancePC.add(Vectors.sqdist(P.get(i), C.get(j)));
+                distancePC.add(Vectors.sqdist(point, center));
             }
             //adding in dists the minimum distance -> the distance of a point from its center
             dists.add(Collections.min(distancePC));
