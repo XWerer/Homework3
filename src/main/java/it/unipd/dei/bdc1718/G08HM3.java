@@ -89,7 +89,7 @@ public class G08HM3 {
         Vector max = Vectors.zeros(1);  //mi salvo il quello che sta a distanza massima
         ArrayList<Double> dist = new ArrayList<>(); //distanza massima
         double distanza = 0.0;
-        double temp = 0.0;
+        double temp;
         boolean primo = true;
         //così so quale cancellare dall'array list delle distanze
         int indice = 0;
