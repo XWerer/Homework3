@@ -108,8 +108,12 @@ public class G08HM3 {
                     }
                 }
                 else{//negli altri
+                    /*
                     temp = dist.get(j) + Vectors.sqdist(centers.get(i), P.get(j));
                     dist.set(j,temp);
+                    */
+                    if(dist.get(j) > Vectors.sqdist(centers.get(i), P.get(j)))
+                        dist.set(j, Vectors.sqdist(centers.get(i), P.get(j)));
                     if(dist.get(j)> distanza) { //trovo il punto più distante da il resto dei punti
                         max = P.get(j);
                         distanza = dist.get(j);
