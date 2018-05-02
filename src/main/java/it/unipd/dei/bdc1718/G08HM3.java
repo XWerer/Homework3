@@ -158,8 +158,8 @@ public class G08HM3 {
             }
             //We go to choose  the next center with the probability distribution
             double r = Math.random(); //For a random value
-            double value = 0; //The incrementation of the probability
-            for(int j = 0; j < P.size(); j++){
+            double value = dist.get(0) * weights.get(0) / totalDistance; //The incrementation of the probability
+            for(int j = 1; j < P.size(); j++){
                 value += dist.get(j) * weights.get(j) / totalDistance;
                 if (r < (value)) {
                     //In this case we can take the new center and remove the corresponding value from the other List
