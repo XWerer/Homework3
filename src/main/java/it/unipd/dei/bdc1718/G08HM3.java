@@ -83,50 +83,46 @@ public class G08HM3 {
         System.out.println("\nThe average of the distances in the coreset is: " + kmeansObj(points, coreSet));
     }
 
-    //Method k-center with time complexity O( |P| * k )
-    private static ArrayList<Vector> kcenter (ArrayList<Vector> P ,int k){
+    //Method kcenter with time complexity O( |P| * k )
+    private static ArrayList<Vector> kcenter(ArrayList<Vector> P, int k) {
         ArrayList<Vector> centers = new ArrayList<>();
-        Vector max = Vectors.zeros(1);  //mi salvo il quello che sta a distanza massima
-        ArrayList<Double> dist = new ArrayList<>(); //distanza massima
-        double distanza = 0.0;
-        double temp;
-        boolean primo = true;
-        //così so quale cancellare dall'array list delle distanze
+        //storing the centers
+        Vector max = Vectors.zeros(1);
+        //storing the various distance
+        ArrayList<Double> dist = new ArrayList<>();
+        double distance = 0.0;
+        //storing the indices of the center
         int indice = 0;
-        //nelle slide c'è scritto prende un punto arbitrario, prendo il primo
-        centers.add(P.get(0));
-        //lo tolgo così non lo considero nel calcolo delle distanze
-        P.remove(0);
-        for(int i = 0; i < k - 1; i++ ){//k-1 perchè il primo lo do io
-            for(int j = 0; j < P.size(); j++){
-                if(primo) {//primo giro devo calcolare la distanza dal primo punto
-                    dist.add(Vectors.sqdist(centers.get(0), P.get(j)));
-                    if(dist.get(j)> distanza) { //trovo il punto più distante da il resto dal punto inizale
+        //first center decided at random
+        int r = (int)(Math.random() * P.size());
+        //add it to the set S of centers
+        centers.add(P.get(r));
+        //removing the first center from the set P
+        P.remove(r);
+        for (int i = 0; i < k - 1; i++) {               //k-1 because the first center is yet determined
+            for (int j = 0; j < P.size(); j++) {
+                if (i==0) {                             //first round i have to compute the distance to the center for every point
+                    dist.add(Vectors.sqdist(centers.get(i), P.get(j)));
+                    if (dist.get(j) > distance) { //find the farther point
                         max = P.get(j);
-                        distanza = dist.get(j);
+                        distance = dist.get(j);
+                        indice = j;
+                    }
+                } else {
+                    if (dist.get(j) > Vectors.sqdist(centers.get(i), P.get(j))) {       //find the closest center from every point of P
+                        dist.set(j, Vectors.sqdist(centers.get(i), P.get(j)));
+                    }
+                    if (dist.get(j) > distance) {                                       //find the value that maximize d(Ci,S)
+                        max = P.get(j);
+                        distance = dist.get(j);
                         indice = j;
                     }
                 }
-                else{//negli altri
-
-                    temp = dist.get(j) + Vectors.sqdist(centers.get(i), P.get(j));
-                    dist.set(j,temp);
-                    /*
-                    if(dist.get(j) > Vectors.sqdist(centers.get(i), P.get(j)))
-                        dist.set(j, Vectors.sqdist(centers.get(i), P.get(j)));
-                        */
-                    if(dist.get(j)> distanza) { //trovo il punto più distante da il resto dei punti
-                        max = P.get(j);
-                        distanza = dist.get(j);
-                        indice=j;
-                    }
-                }
-            }//fine for P
-            primo = false;
-            centers.add(max);           //quando lho trovato lo aggiungo a quelli trovati e lo
-            P.remove(max);              //tolgo così non lo conisidero più
-            //P.remove(indice);         //forse meglio in termini di efficenza questo
-            dist.remove(indice);        //tolgo anche la distanza annessa
+            }//end for P
+            centers.add(max);           //once i found the centers we add it to the set S of centers
+            P.remove(indice);           //and we can remove it from the set of point P
+            dist.remove(indice);        //we remove also the value of the distance to maintain the accuracy of the array
+            distance=0.0;               //reset the distance
         }//fine for k
         return centers;
     }
