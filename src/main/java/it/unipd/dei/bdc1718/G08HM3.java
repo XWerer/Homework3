@@ -37,10 +37,12 @@ public class G08HM3 {
         end = System.currentTimeMillis();
         System.out.println("\nTime for k-center algorithm is: " + (end - start) + " ms");
 
-        //For viewing the centers computed by k-center
+        //For viewing the centers computed by k-center for debugging
+        /*
         System.out.println("The number of centers of k-center algorithm are " + centers.size() + " and are:");
         for(Vector center : centers)
             System.out.println(center);
+        */
 
         //We need to add the centers to the set P because the algorithm above modify it
         points.addAll(centers);
@@ -56,10 +58,15 @@ public class G08HM3 {
         end = System.currentTimeMillis();
         System.out.println("\nTime for k-means++ algorithm is: " + (end - start) + " ms");
 
-        //For viewing the centers computed by k-means++
+        //For viewing the centers computed by k-means++ for debugging
+        /*
         System.out.println("\nThe number of centers of k-means++ algorithm are " + centers.size() + " and are:");
         for(Vector center : centers)
             System.out.println(center);
+        */
+
+        //We need to add the centers to the set P because the algorithm above modify it
+        points.addAll(centers);
 
         //Now we can run the k-meansObj algorithm
         System.out.println("\nThe average of the distances is " + kmeansObj(points, centers));
@@ -78,8 +85,13 @@ public class G08HM3 {
 
         //Now we can run k-means++ for extract the coreset from centers
         centers = kmeansPP(coreSet, weights, k);
+        /* printing the centers for debugging
         for(Vector center : centers)
             System.out.println(center);
+        */
+
+        //We need to add the centers to the set P because the algorithm above modify it
+        points.addAll(centers);
 
         //Now print the returned value from k-meansObj
         System.out.println("\nThe average of the distances in the new centers is: " + kmeansObj(points, centers));
