@@ -92,13 +92,11 @@ public class G08HM3 {
         ArrayList<Double> dist = new ArrayList<>();
         double distance = 0.0;
         //storing the indices of the center
-        int indice = 0;
+        int index = 0;
         //first center decided at random
         int r = (int)(Math.random() * P.size());
-        //add it to the set S of centers
-        centers.add(P.get(r));
-        //removing the first center from the set P
-        P.remove(r);
+        //add it to the set S of centers and remove it
+        centers.add(P.remove(r));
         for (int i = 0; i < k - 1; i++) {               //k-1 because the first center is yet determined
             for (int j = 0; j < P.size(); j++) {
                 if (i==0) {                             //first round i have to compute the distance to the center for every point
@@ -106,7 +104,7 @@ public class G08HM3 {
                     if (dist.get(j) > distance) { //find the farther point
                         max = P.get(j);
                         distance = dist.get(j);
-                        indice = j;
+                        index = j;
                     }
                 } else {
                     if (dist.get(j) > Vectors.sqdist(centers.get(i), P.get(j))) {       //find the closest center from every point of P
@@ -115,13 +113,13 @@ public class G08HM3 {
                     if (dist.get(j) > distance) {                                       //find the value that maximize d(Ci,S)
                         max = P.get(j);
                         distance = dist.get(j);
-                        indice = j;
+                        index = j;
                     }
                 }
             }//end for P
             centers.add(max);           //once i found the centers we add it to the set S of centers
-            P.remove(indice);           //and we can remove it from the set of point P
-            dist.remove(indice);        //we remove also the value of the distance to maintain the accuracy of the array
+            P.remove(index);           //and we can remove it from the set of point P
+            dist.remove(index);        //we remove also the value of the distance to maintain the accuracy of the array
             distance=0.0;               //reset the distance
         }//fine for k
         return centers;
@@ -132,14 +130,13 @@ public class G08HM3 {
         ArrayList<Vector> centers = new ArrayList<>(); //ArrayList for the centers
         ArrayList<Double> dist = new ArrayList<>(); //ArrayList for the distances
         //Now we pick the first center randomly and remove it from the points and the weights
-        int firstCenter = (int)(Math.random()*P.size());
+        int firstCenter = (int) (Math.random() * P.size());
         centers.add(P.remove(firstCenter));
         weights.remove(firstCenter);
         double distance, totalDistance = 0;
-        boolean firstIt = true; //For manage the first center
-        for (int i = 0; i < k-1; i++){
+        for (int i = 0; i < k - 1; i++){
             for (int j = 0; j < P.size(); j++){
-                if(firstIt){
+                if(i == 0){
                     //In the first iteration we need to compute only the distance
                     distance = Vectors.sqdist(P.get(j), centers.get(0));
                     dist.add(distance);
@@ -170,7 +167,6 @@ public class G08HM3 {
                 }
             }
             totalDistance = 0;
-            firstIt = false;
         }
         return centers;
     }
