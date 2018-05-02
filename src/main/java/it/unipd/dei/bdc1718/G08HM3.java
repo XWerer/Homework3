@@ -38,7 +38,7 @@ public class G08HM3 {
         System.out.println("\nTime for k-center algorithm is: " + (end - start) + " ms");
 
         //For viewing the centers computed by k-center
-        System.out.println("The number of centers of k-center algorithm are: " + centers.size() + " and are:");
+        System.out.println("The number of centers of k-center algorithm are " + centers.size() + " and are:");
         for(Vector center : centers)
             System.out.println(center);
 
@@ -57,7 +57,7 @@ public class G08HM3 {
         System.out.println("\nTime for k-means++ algorithm is: " + (end - start) + " ms");
 
         //For viewing the centers computed by k-means++
-        System.out.println("The number of centers of k-means++ algorithm are: " + centers.size() + " and are:");
+        System.out.println("\nThe number of centers of k-means++ algorithm are " + centers.size() + " and are:");
         for(Vector center : centers)
             System.out.println(center);
 
@@ -69,7 +69,7 @@ public class G08HM3 {
 
         //Now we are going to extract a coreset where we can run k-means++
         //The first thing to do is to run k-center
-        centers = kcenter(points, k1);
+        ArrayList<Vector> coreSet = kcenter(points, k1);
 
         //Now we need to create the weights for centers
         weights.clear();
@@ -77,10 +77,12 @@ public class G08HM3 {
             weights.add(1L);
 
         //Now we can run k-means++ for extract the coreset from centers
-        ArrayList<Vector> coreSet = kmeansPP(centers, weights, k);
+        centers = kmeansPP(coreSet, weights, k);
+        for(Vector center : centers)
+            System.out.println(center);
 
         //Now print the returned value from k-meansObj
-        System.out.println("\nThe average of the distances in the coreset is: " + kmeansObj(points, coreSet));
+        System.out.println("\nThe average of the distances in the new centers is: " + kmeansObj(points, centers));
     }
 
     //Method kcenter with time complexity O( |P| * k )
@@ -106,7 +108,8 @@ public class G08HM3 {
                         distance = dist.get(j);
                         index = j;
                     }
-                } else {
+                }
+                else {
                     if (dist.get(j) > Vectors.sqdist(centers.get(i), P.get(j))) {       //find the closest center from every point of P
                         dist.set(j, Vectors.sqdist(centers.get(i), P.get(j)));
                     }
@@ -175,24 +178,17 @@ public class G08HM3 {
     private static double kmeansObj(ArrayList<Vector> P, ArrayList<Vector> C) {
         //Arraylist that keeps the distances between a point and all centers
         ArrayList<Double> distancePC = new ArrayList<>();
-        //ArrayList to keep the distance of a point from its center (minimum)
-        ArrayList<Double> dists = new ArrayList<>();
+        double distance = 0.0;
         for (Vector point : P) {
             for (Vector center : C) {
                 //writing in distancePC the squared distances between a point and all centers
                 distancePC.add(Vectors.sqdist(point, center));
             }
-            //adding in dists the minimum distance -> the distance of a point from its center
-            dists.add(Collections.min(distancePC));
+            //Summing the distance between the point and its center
+            distance += Collections.min(distancePC);
             //clearing of distancePC, for the next point
             distancePC.clear();
         }
-        //now i have dists with all distances between a point and its center
-        //computing the average
-        double sum = 0;
-        for (Double dist : dists) {
-            sum += dist;
-        }
-        return sum/P.size();
+        return distance/P.size();
     }
 }
